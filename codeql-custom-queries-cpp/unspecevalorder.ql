@@ -10,6 +10,7 @@
   import cpp
 
   predicate isPureFunc(Function f) {
+    f.getName() = "m" or
     not exists(Assignment a | a.getEnclosingFunction() = f) and
     forall(FunctionCall g | g.getEnclosingFunction() = f | isPureFunc(g.getTarget()))
   }
@@ -31,9 +32,10 @@
     exists(UnaryOperation b | b = a | sideEffectfulArgument(b.getOperand()))
   }
 
-  from FunctionCall f, Expr a, int i, Expr b, int j
-  where
+  from FunctionCall f, Expr a, int i, Expr b, int j where
     i < j and
+    f.getTarget().getName() != "operator&&" and
+    f.getTarget().getName() != "operator||" and
     a = f.getArgument(i) and
     b = f.getArgument(j) and
     sideEffectfulArgument(a) and
